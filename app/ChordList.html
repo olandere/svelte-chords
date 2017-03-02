@@ -1,0 +1,19 @@
+<div class='chord-list'>
+	{{#each chordList as chord}}
+	<Chord chord data='{{chord}}'/>
+	{{/each}}
+</div>
+
+<script>
+  import Chord from './Chord.html';
+	
+	export default {
+		// onrender () {
+//
+// 		},
+		
+		components: {
+		      Chord
+		    }
+	};
+</script>
