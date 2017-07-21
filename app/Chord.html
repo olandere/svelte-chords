@@ -2,10 +2,10 @@
 <script>
   //import _ from 'lodash';
 	//import d3 from 'd3';
-
+'use strict';
   
 	export default {
-	    onrender () {
+	    oncreate () {
 				// var d3 = require('d3');
 				// var _ = require('lodash');
       var numFrets = 6;
@@ -28,9 +28,7 @@
       var frets = [];
 
       var computeAdjustment = function(numFrets, chord) {
-        var minFret = _.min(_.filter(chord, function(v) {
-          return _.isNumber(v) && v > 0;
-        }));
+        var minFret = _.min(_.filter(chord, v => _.isNumber(v) && v > 0));
         var maxFret = _.max(_.filter(chord, _.isNumber));
         var fretMarker = 0;
         var span = maxFret - minFret + 1;
@@ -138,9 +136,7 @@
       crosses.attr('x', function(d, i) {
           return stringScale(i);
         })
-        .attr('y', function(d, i) {
-          return fretScale(0);
-        })
+        .attr('y', fretScale(0))
         .attr('text-anchor', 'middle')
         .text(function(d) {
           if (d == 'x') {
@@ -168,9 +164,7 @@
       chordDegrees.attr('x', function(d, i) {
           return stringScale(i);
         })
-        .attr('y', function(d, i) {
-          return fretScale(numFrets);
-        })
+        .attr('y', fretScale(numFrets))
         .attr('text-anchor', 'middle')
         .attr("lengthAdjust", "spacing")
         .attr("textLength", stringScale(1) - stringScale(0))

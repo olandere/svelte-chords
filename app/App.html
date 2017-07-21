@@ -1,5 +1,47 @@
+<h1>Chord charts - beta</h1>
+<form novalidate class="form-inline" role="form">
+    <div class="form-group">
+      <label title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:
+      <input type="text"
+             ng-model="chord.myData.chord"
+             ng-change="chord.onChange()"
+             class="form-control"
+             placeholder="Enter chord(s) here"
+             ng-required=true>
+      </label>
+    </div>
+    <div class="form-group">
+      <label title="">Fret span: <input type="number"
+                                               class="form-control"
+                                               value="4"
+                                               placeholder="4"
+                                               min="1"
+                                               max="12"></label>
+    </div>
+      <div class="form-group">
+          <label>Tuning: </label>
+      </div>
+      <div class="checkbox">
+      <label>
+          <input type="checkbox" >Shell
+      </label></div>
+      <div class="checkbox">
+      <label>
+          <input type="checkbox" >Condense
+      </label></div>
+          <div class="checkbox">
+      <label>
+          <input type="checkbox" >Jazz voicings only
+      </label></div>
+
+    <input type="submit"  class="btn btn-primary"/>
+      <a href="help.html">How do I use this???</a>
+  </form>
+	
 <script>
+
 import ChordList from './ChordList.html';
+import ChordService from './ChordService';
 import './app.css';
 
 export default {
@@ -8,17 +50,34 @@ export default {
  }
 };
 
-fetch("http://localhost:8080/chords/4?chord=Am7&jazz=false&tuning=EADGBE" 
-  ).then(function(resp) {
-	  console.log(resp);
-	  return resp.json();
-  }).then(function(j) {
-		 var cl = new ChordList({
- 			target: document.querySelector( 'main' ),
- 			data: j
- 		});
-		 console.log(j);
-		// return j;
-	 });
+var cl = new ChordList(
+		{ target: document.querySelector( 'main' )
+ 	  }
+ 	);
+	
+var cs = new ChordService("http://localhost:8080");
+
+cs.chords(4, 'Am7', 'EADGBE', false, false).then(j => console.log(j);//cl.setData(j);
+	// { var cl = new ChordList(
+// 		{ target: document.querySelector( 'main' ),
+// 		  data: j
+// 	  }
+// 	)}
+);
+
+
+// fetch("http://localhost:8080/chords/4?chord=Am7&jazz=false&tuning=EADGBE"
+//   ).then(function(resp) {
+// 	  console.log(resp);
+// 	  return resp.json();
+//   }).then(function(j) {
+// 		 var cl = new ChordList({
+//  			target: document.querySelector( 'main' ),
+//  			data: j
+//  		});
+// 		 console.log(j);
+// 		// return j;
+// 	 });
 </script>
+	 
 <main></main>

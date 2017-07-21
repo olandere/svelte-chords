@@ -1,9 +1,10 @@
-var path = require('path');
+const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+process.traceDeprecation = true;
 
 module.exports = {
-  entry: './app/main.js',
+  entry: ["whatwg-fetch", "./app/main.js"],
 	resolve: {
 		extensions: [ '.js', '.html', '.css' ]
 	},
@@ -21,15 +22,9 @@ module.exports = {
 	],
 	module: {
 	  rules: [
-				{
-		        test: /\.html$/,
-				    exclude: /node_modules/,
-				    use: 'svelte-loader'
-	      },
-				{
-					test: /\.css$/,
-					loader: 'style-loader!css-loader'
-				}
+			{ test: [/\.html$/, /\.js$/], exclude: [/node_modules/], use: [{loader: "babel-loader", options: { presets: ['es2015']} }]},
+			{ test: /\.html$/, exclude: [/node_modules/], use: 'svelte-loader'},
+			{ test: /\.css$/, use: ['style-loader', 'css-loader'] }		
 		]
 	}
 };
