@@ -3,11 +3,9 @@
     <div class="form-group">
       <label title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:
       <input type="text"
-             ng-model="chord.myData.chord"
-             ng-change="chord.onChange()"
              class="form-control"
              placeholder="Enter chord(s) here"
-             ng-required=true>
+             required=true>
       </label>
     </div>
     <div class="form-group">
@@ -37,7 +35,11 @@
     <input type="submit"  class="btn btn-primary"/>
       <a href="help.html">How do I use this???</a>
   </form>
-	
+
+  {{#if chords}}
+    <ChordList chords="{{chords}}" />
+  {{/if}}
+
 <script>
 
 import ChordList from './ChordList.html';
@@ -47,23 +49,28 @@ import './app.css';
 export default {
  components: {
    ChordList
+ },
+ oncreate() {
+   // Component initialization happens here, see
+   var cs = new ChordService("http://localhost:8080");
+   cs.chords(4, 'Am7', 'EADGBE', false, false).then(chords => this.set({ chords }));
  }
 };
 
-var cl = new ChordList(
-		{ target: document.querySelector( 'main' )
- 	  }
- 	);
-	
-var cs = new ChordService("http://localhost:8080");
+// var cl = new ChordList(
+// 		{ target: document.querySelector( 'main' )
+//  	  }
+//  	);
 
-cs.chords(4, 'Am7', 'EADGBE', false, false).then(j => console.log(j);//cl.setData(j);
+// var cs = new ChordService("http://localhost:8080");
+//
+// cs.chords(4, 'Am7', 'EADGBE', false, false).then(j => console.log(j);//cl.setData(j);
 	// { var cl = new ChordList(
 // 		{ target: document.querySelector( 'main' ),
 // 		  data: j
 // 	  }
 // 	)}
-);
+// );
 
 
 // fetch("http://localhost:8080/chords/4?chord=Am7&jazz=false&tuning=EADGBE"
@@ -79,5 +86,3 @@ cs.chords(4, 'Am7', 'EADGBE', false, false).then(j => console.log(j);//cl.setDat
 // 		// return j;
 // 	 });
 </script>
-	 
-<main></main>

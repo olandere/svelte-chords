@@ -1,7 +1,7 @@
 'use strict';
 import 'whatwg-fetch';
 
-class ChordService {
+export default class ChordService {
 	constructor(base) {
 		this.base = base;
 	}
