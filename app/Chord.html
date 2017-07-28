@@ -1,18 +1,14 @@
 <div class="chord" ref:chord></div>
 <script>
-  //import _ from 'lodash';
-	//import d3 from 'd3';
 'use strict';
   
 	export default {
 	    oncreate () {
-				// var d3 = require('d3');
-				// var _ = require('lodash');
       var numFrets = 6;
-      var chord = this._state.frets || this._state.data.frets;
-      var degrees = this._state.degrees || this._state.data.degrees;
-			var notes = this._state.notes || this._state.data.notes;
-      var name = this._state.name || this._state.data.name;
+      var chord = this.get('chord');
+      var degrees = this.get('degrees');
+      var notes = this.get('notes');
+      var name = this.get('name');
 
       var numStrings = chord.length;
 
