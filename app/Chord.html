@@ -1,9 +1,14 @@
 <div class="chord" ref:chord></div>
 <script>
 'use strict';
-  
+
 	export default {
-	    oncreate () {
+    oncreate() {
+      ['chord', 'degrees', 'notes', 'name']
+        .forEach(prop => this.observe(prop, () => this.renderData()))
+    },
+    methods: {
+	    renderData () {
       var numFrets = 6;
       var chord = this.get('chord');
       var degrees = this.get('degrees');
@@ -171,6 +176,6 @@
             return d;
           }
         });
-
+      }
     }};
 		</script>

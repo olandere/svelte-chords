@@ -7,11 +7,15 @@
 
 <script>
   import Chord from './Chord.html';
-	
+
 	export default {
-		
+
 		components: {
 		      Chord
-		    }
+		    },
+				oncreate() {
+					this.observe('chords', c => console.log(c));
+				}
+
 	};
 </script>
