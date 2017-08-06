@@ -1,21 +1,26 @@
 <div class='chord-list'>
 	<!--Chord name='C' chord='["x", 3, 2, 0, 1, 0]' degrees='["x", "R", "3", "5", "R", "3"]' notes='[]'-->
 	{{#each chords.chordList as chord}}
-	<Chord name='{{chord.name}}' chord='{{chord.frets}}' degrees='{{chord.degrees}}' notes='{{chord.notes}}'/>
+	<Chord name='{{chord.name}}' chord='{{chord.frets}}' degrees='{{chord.degrees}}' notes='{{chord.notes}}'></Chord>
 	{{/each}}
 </div>
 
 <script>
   import Chord from './Chord.html';
 
-	export default {
-
-		components: {
-		      Chord
-		    },
-				oncreate() {
-					this.observe('chords', c => console.log(c));
-				}
-
-	};
+  export default {
+    data() {
+      return {
+        chords: {
+          chordList: []
+        }
+      };
+    },
+    components: {
+      Chord
+    },
+    oncreate() {
+      this.observe('chords', c => console.log(c));
+    }
+  };
 </script>
