@@ -1,181 +1,184 @@
 <div class="chord" ref:chord></div>
 <script>
-'use strict';
+  'use strict';
 
-	export default {
+  export default {
     oncreate() {
-      ['chord', 'degrees', 'notes', 'name']
-        .forEach(prop => this.observe(prop, () => this.renderData()))
+      this.renderData();
+      //  ['chord', 'degrees', 'notes', 'name']
+      //    .forEach(prop => this.observe(prop, () => this.renderData()))
+      //	this.observe('chord', () => this.destroy());
     },
     methods: {
-	    renderData () {
-      var numFrets = 6;
-      var chord = this.get('chord');
-      var degrees = this.get('degrees');
-      var notes = this.get('notes');
-      var name = this.get('name');
+      renderData() {
+        const numFrets = 6;
+        const chord = this.get('chord');
+        const degrees = this.get('degrees');
+        const notes = this.get('notes');
+        const name = this.get('name');
 
-      var numStrings = chord.length;
+        const numStrings = chord.length;
 
-      //Width and height
-      var w = 11 * numStrings;
-      var h = 10 + 10 * numFrets;
-      var padding = 36;
-      var topPad = 25;
-      var bottomPad = 20;
+        //Width and height
+        const w = 11 * numStrings;
+        const h = 10 + 10 * numFrets;
+        const padding = 36;
+        const topPad = 25;
+        const bottomPad = 20;
 
-      var svg = d3.select(this.refs.chord).append('svg').attr('width', w + padding).attr('height', h + topPad + bottomPad);
+        const svg = d3.select(this.refs.chord).append('svg').attr('width', w + padding).attr('height', h + topPad + bottomPad);
 
-      var frets = [];
+        let frets = [];
 
-      var computeAdjustment = function(numFrets, chord) {
-        var minFret = _.min(_.filter(chord, v => _.isNumber(v) && v > 0));
-        var maxFret = _.max(_.filter(chord, _.isNumber));
-        var fretMarker = 0;
-        var span = maxFret - minFret + 1;
-        if (maxFret > numFrets) {
-          if (span < numFrets) {
-            fretMarker = (minFret % 2 == 1) ? minFret : minFret - 1;
-          } else {
-            fretMarker = minFret;
+        const computeAdjustment = function (numFrets, chord) {
+          const minFret = _.min(_.filter(chord, v => _.isNumber(v) && v > 0));
+          const maxFret = _.max(_.filter(chord, _.isNumber));
+          let fretMarker = 0;
+          const span = maxFret - minFret + 1;
+          if (maxFret > numFrets) {
+            if (span < numFrets) {
+              fretMarker = (minFret % 2 === 1) ? minFret : minFret - 1;
+            } else {
+              fretMarker = minFret;
+            }
           }
+
+          return fretMarker;
+        };
+
+        const fretMarker = computeAdjustment(numFrets - 1, chord);
+        const fretAdj = fretMarker > 0 ? 1 - fretMarker : 0;
+
+        const stringScale = d3.scaleLinear().domain([0, numStrings - 1]).range([padding / 2, w + padding / 2]);
+        const fretScale = d3.scaleLinear().domain([0, numFrets - 1]).range([topPad, h + topPad]);
+
+        //TODO: can this be replaced/eliminated???
+        for (let i = 0; i < numFrets; i++) {
+          frets.push(i);
         }
 
-        return fretMarker;
-      };
+        const chordElem = svg.append('g');
+        chordElem.append('text').attr('text-anchor', 'middle').attr('transform', 'translate(0, 12)').attr('x',
+          (w + padding) /
+          2).attr('y',
+          0).text(name);
 
-      var fretMarker = computeAdjustment(numFrets - 1, chord);
-      var fretAdj = fretMarker > 0 ? 1 - fretMarker : 0;
+        const stringLines = chordElem.append('g').selectAll('line')
+          .data(chord)
+          .enter()
+          .append('line');
 
-      var stringScale = d3.scaleLinear().domain([0, numStrings - 1]).range([padding / 2, w + padding / 2]);
-      var fretScale = d3.scaleLinear().domain([0, numFrets - 1]).range([topPad, h + topPad]);
+        stringLines.attr('x1', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('x2', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('y1', fretScale(0))
+          .attr('y2', fretScale(numFrets - 1))
+          .attr('stroke', 'black');
 
-      //TODO: can this be replaced/eliminated???
-      for (var i = 0; i < numFrets; i++) {
-        frets.push(i);
-      }
+        const fretLines = chordElem.append('g').selectAll('line')
+          .data(frets)
+          .enter()
+          .append('line');
 
-      var chordElem = svg.append('g');
-      chordElem.append('text').attr('text-anchor', 'middle').attr('transform', 'translate(0, 12)').attr('x',
-        (w + padding) /
-        2).attr('y',
-        0).text(name);
-
-      var stringLines = chordElem.append('g').selectAll('line')
-        .data(chord)
-        .enter()
-        .append('line');
-
-      stringLines.attr('x1', function(d, i) {
-          return stringScale(i);
-        })
-        .attr('x2', function(d, i) {
-          return stringScale(i);
-        })
-        .attr('y1', fretScale(0))
-        .attr('y2', fretScale(numFrets - 1))
-        .attr('stroke', 'black');
-
-      var fretLines = chordElem.append('g').selectAll('line')
-        .data(frets)
-        .enter()
-        .append('line');
-
-      fretLines.attr('y1', function(d, i) {
-          return fretScale(i);
-        })
-        .attr('y2', function(d, i) {
-          return fretScale(i);
-        })
-        .attr('x1', stringScale(0))
-        .attr('x2', stringScale(numStrings - 1))
-        .attr('stroke', 'black')
-        .attr('stroke-width', function(d, i) {
-          if (i == 0 && fretAdj == 0) {
-            return 3;
-          } else {
-            return 1;
-          }
-        });
-
-      var dots = chordElem.append('g').attr('transform',
-        'translate(0,' + (-h / (2 * (numFrets - 1))) + ')').selectAll('circle')
-        .data(chord)
-        .enter()
-        .append('circle');
-
-      dots.attr('cx', function(d, i) {
-          return stringScale(i);
-        })
-        .attr('cy', function(d) {
-          if (d == 'x') {
-            return 0;
-          }
-
-          return (d == 0) ? fretScale(0) : fretScale(d + fretAdj);
-        }).attr('style', function(d, i) {
-          if (d != 0) {
-            return 'fill: black';
-          } else {
-            return 'fill: white';
-          }
-        })
-        .attr('stroke', 'black')
-        .attr('r', function(d) {
-          if (d == 'x') {
-            return 0;
-          } else {
-            return 4;
-          }
-        });
-
-      var crosses = chordElem.append('g').attr('transform', 'translate(0, -2)').selectAll('text')
-        .data(chord)
-        .enter()
-        .append('text');
-
-      crosses.attr('x', function(d, i) {
-          return stringScale(i);
-        })
-        .attr('y', fretScale(0))
-        .attr('text-anchor', 'middle')
-        .text(function(d) {
-          if (d == 'x') {
-            return '\u00D7';
-          }
-        });
-
-      if (fretMarker > 0) {
-        chordElem.append('g').append('text').text(fretMarker).attr('y', fretScale(1)).attr('x', function() {
-            if (fretMarker < 10) {
-              return 13;
+        fretLines.attr('y1', function (d, i) {
+            return fretScale(i);
+          })
+          .attr('y2', function (d, i) {
+            return fretScale(i);
+          })
+          .attr('x1', stringScale(0))
+          .attr('x2', stringScale(numStrings - 1))
+          .attr('stroke', 'black')
+          .attr('stroke-width', function (d, i) {
+            if (i == 0 && fretAdj == 0) {
+              return 3;
             } else {
-              return 14;
+              return 1;
+            }
+          });
+
+        const dots = chordElem.append('g').attr('transform',
+          'translate(0,' + (-h / (2 * (numFrets - 1))) + ')').selectAll('circle')
+          .data(chord)
+          .enter()
+          .append('circle');
+
+        dots.attr('cx', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('cy', function (d) {
+            if (d === 'x') {
+              return 0;
+            }
+
+            return (d === 0) ? fretScale(0) : fretScale(d + fretAdj);
+          }).attr('style', function (d, i) {
+            if (d !== 0) {
+              return 'fill: black';
+            } else {
+              return 'fill: white';
             }
           })
-          .attr('text-anchor', 'end');
-      }
+          .attr('stroke', 'black')
+          .attr('r', function (d) {
+            if (d === 'x') {
+              return 0;
+            } else {
+              return 4;
+            }
+          });
 
-      // show chord degrees
-      var chordDegrees = chordElem.append('g').selectAll('text')
-        .data(degrees)
-        .enter()
-        .append('text');
+        const crosses = chordElem.append('g').attr('transform', 'translate(0, -2)').selectAll('text')
+          .data(chord)
+          .enter()
+          .append('text');
 
-      chordDegrees.attr('x', function(d, i) {
-          return stringScale(i);
-        })
-        .attr('y', fretScale(numFrets))
-        .attr('text-anchor', 'middle')
-        .attr("lengthAdjust", "spacing")
-        .attr("textLength", stringScale(1) - stringScale(0))
-        .text(function(d) {
-          if (d == 'x') {
-            return '\u00D7'
-          } else {
-            return d;
-          }
-        });
+        crosses.attr('x', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('y', fretScale(0))
+          .attr('text-anchor', 'middle')
+          .text(function (d) {
+            if (d === 'x') {
+              return '\u00D7';
+            }
+          });
+
+        if (fretMarker > 0) {
+          chordElem.append('g').append('text').text(fretMarker).attr('y', fretScale(1)).attr('x', function () {
+              if (fretMarker < 10) {
+                return 13;
+              } else {
+                return 14;
+              }
+            })
+            .attr('text-anchor', 'end');
+        }
+
+        // show chord degrees
+        const chordDegrees = chordElem.append('g').selectAll('text')
+          .data(degrees)
+          .enter()
+          .append('text');
+
+        chordDegrees.attr('x', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('y', fretScale(numFrets))
+          .attr('text-anchor', 'middle')
+          .attr("lengthAdjust", "spacing")
+          .attr("textLength", stringScale(1) - stringScale(0))
+          .text(function (d) {
+            if (d === 'x') {
+              return '\u00D7'
+            } else {
+              return d;
+            }
+          });
       }
-    }};
-		</script>
+    }
+  };
+</script>
