@@ -1,73 +1,87 @@
-<h1>Chord charts - beta</h1>
-<!--form novalidate class="form-inline" role="form" on:submit='handleSubmit( event )' -->
-    <div class="form-group">
-      <label title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:
-      <input type="text"
-			       bind:value='chordName'
-             class="form-control"
-             placeholder="Enter chord(s) here"
-             required=true>
-      </label>
-    </div>
-    <div class="form-group">
-      <label title="">Fret span: <input type="number"
-                                               class="form-control"
-																							 bind:value='fretSpan'
-                                               value="4"
-                                               placeholder="4"
-                                               min="1"
-                                               max="12"></label>
-    </div>
-      <div class="form-group">
-          <label>Tuning: </label>
-      </div>
-      <div class="checkbox">
-      <label>
-          <input type="checkbox" >Shell
-      </label></div>
-      <div class="checkbox">
-      <label>
-          <input type="checkbox" >Condense
-      </label></div>
-          <div class="checkbox">
-      <label>
-          <input type="checkbox" >Jazz voicings only
-      </label></div>
-
-    <input type="button"  class="btn btn-primary" value="Submit" on:click='handleSubmit( event )'/>
-      <a href="help.html">How do I use this???</a>
+<div class="container-fluid">
+  <h1>Chord charts - beta</h1>
+  <!--form novalidate class="form-inline" -->
+  <label title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:
+    <input type="text"
+           class="form-control"
+           bind:value='chordName'
+           placeholder="Enter chord(s) here"
+           required>
+  </label>
+  <label title="">Fret span: <input type="number"
+                                    class="form-control"
+                                    bind:value='fretSpan'
+                                    value="4"
+                                    placeholder="4"
+                                    min="1"
+                                    max="12"></label>
+  <div class="form-group">
+    <label>Tuning: </label>
+    <Tuning></Tuning>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox">Shell
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox">Condense
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox">Jazz voicings only
+    </label>
+  </div>
+  <input type="button" class="btn btn-primary" value="Submit" on:click="handleSubmit(event)"/>
+  <a href="help.html">How do I use this???</a>
   <!--/form-->
-
-  {{#if chords}}
-    <ChordList chords="{{chords}}" />
-  {{/if}}
-
+  <hr>
+  <div id="chordlist">
+    <!--ChordList ref:chordlist /-->
+  </div>
+</div>
 <script>
 
-import ChordList from './ChordList.html';
-import ChordService from './ChordService';
-import './app.css';
+  import ChordList from './ChordList.html';
+  import ChordService from './ChordService';
+  import Tuning from './Tuning.html';
+  import './app.css';
+  import 'bootstrap';
+  import 'bootstrap/dist/css/bootstrap.css';
 
-export default {
-	data() {
-		return {
-			fretSpan: 4
-		};
-	},
- components: {
-   ChordList
- },
- oncreate() {
-   // Component initialization happens here, see
-   var cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
-	 this.set({cs: cs});
- },
- methods: {
-     handleSubmit: function ( event ) {
-		   this.get('cs').chords(this.get( 'fretSpan' ), this.get( 'chordName' ), 
-			                       'EADGBE', false, false).then(chords => this.set({chords: chords }));
-		 }
-	 }
-};
+  export default {
+    data() {
+      return {
+        fretSpan: 4,
+        chordName: ''
+      };
+    },
+    components: {
+      ChordList,
+      Tuning
+    },
+    oncreate() {
+      // Component initialization happens here, see
+      const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
+      this.set({cs: cs});
+    },
+    methods: {
+      handleSubmit: function (event) {
+        this.get('cs').chords(this.get('fretSpan'), this.get('chordName'),
+          'EADGBE', false, false).then(chords => {
+          // this.refs.chordlist.fire( 'thingHappened', {thing: 'this event was fired'});
+          if (this.chordlist) {
+            this.chordlist.destroy();
+          }
+          this.chordlist = new ChordList({
+            target: document.getElementById('chordlist')
+          });
+          this.chordlist.set({chords: chords});
+        })
+      }
+    }
+  };
 
 </script>
