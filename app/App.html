@@ -69,17 +69,30 @@
     },
     methods: {
       handleSubmit: function (event) {
-        this.get('cs').chords(this.get('fretSpan'), this.get('chordName'),
-          'EADGBE', false, false).then(chords => {
-          // this.refs.chordlist.fire( 'thingHappened', {thing: 'this event was fired'});
-          if (this.chordlist) {
-            this.chordlist.destroy();
+        const _this = this;
+
+        function renderChords(chords) {
+          if (_this.chordlist) {
+            _this.chordlist.destroy();
           }
-          this.chordlist = new ChordList({
+          _this.chordlist = new ChordList({
             target: document.getElementById('chordlist')
           });
-          this.chordlist.set({chords: chords});
-        })
+          _this.chordlist.set({chords: chords});
+        }
+
+        const firstChar = _this.get('chordName').trim().charAt(0);
+        if (firstChar.match(/[abcdefgrs]/i)) {
+          _this.get('cs').chords(this.get('fretSpan'), _this.get('chordName'),
+            'EADGBE', false, false).then(chords => {
+            renderChords(chords);
+          })
+        } else {
+          _this.get('cs').analyze(_this.get('chordName'),
+            'EADGBE').then(chords => {
+            renderChords(chords);
+          })
+        }
       }
     }
   };
