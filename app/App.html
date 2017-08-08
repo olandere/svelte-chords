@@ -3,6 +3,7 @@
   <!--form novalidate class="form-inline" -->
   <label title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:
     <input type="text"
+           id="chordInput"
            class="form-control"
            bind:value='chordName'
            placeholder="Enter chord(s) here"
@@ -34,7 +35,7 @@
       <input type="checkbox">Jazz voicings only
     </label>
   </div>
-  <input type="button" class="btn btn-primary" value="Submit" on:click="handleSubmit(event)"/>
+  <input id="submitButton" type="button" class="btn btn-primary" value="Submit" on:click="handleSubmit(event)"/>
   <a href="help.html">How do I use this???</a>
   <!--/form-->
   <hr>
@@ -66,6 +67,13 @@
       // Component initialization happens here, see
       const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
       this.set({cs: cs});
+      document.getElementById("chordInput")
+        .addEventListener("keyup", function(event) {
+          event.preventDefault();
+          if (event.keyCode == 13) {
+            document.getElementById("submitButton").click();
+          }
+        });
     },
     methods: {
       handleSubmit: function (event) {
