@@ -20,8 +20,7 @@ module.exports = {
       _: 'lodash',
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery',
-      Tether: 'tether'
+      'window.jQuery': 'jquery'
     })
   ],
   module: {
@@ -29,7 +28,7 @@ module.exports = {
       {
         test: [/\.html$/, /\.js$/],
         exclude: [/node_modules/],
-        use: [{loader: "babel-loader", options: {presets: ['es2015']}}]
+        use: [{loader: "babel-loader"}]
       },
       {test: /\.html$/, exclude: [/node_modules/], use: 'svelte-loader'},
       {test: /\.css$/, use: ['style-loader', 'css-loader']},
