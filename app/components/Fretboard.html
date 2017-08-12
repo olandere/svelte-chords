@@ -1,0 +1,18 @@
+<div class="fretboard" ref:fretboard></div>
+<script>
+  'use strict';
+
+  export default {
+    oncreate() {
+      this.renderData();
+    },
+    methods: {
+      renderData() {
+        const numFrets = 12;
+        const notes = this.get('frets');
+        const name = this.get('name');
+
+      }
+    }
+  };
+</script>

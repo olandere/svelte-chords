@@ -30,7 +30,7 @@
     },
     computed: {
       tunings: function (t) {
-        return store.get('tunings')
+        return store.get('tunings') || []
       }
     },
 
