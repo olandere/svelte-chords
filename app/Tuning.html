@@ -1,23 +1,67 @@
 <div class="input-group">
-    <input type="text" class="form-control" bind:value="tuning" placeholder="EADGBE">
-    <div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-        <ul id="tuning-dropdown-menu" class="dropdown-menu dropdown-menu-right" role="menu">
-            <li ng-repeat="tuning in tunings"><a href="#" ng-click="chord.changeTuning(tuning)">{{tuning | transformSymbols | capitalize}}</a></li>
-        </ul>
-    </div>
+  <input type="text" class="tuning form-control" bind:value="tuning" placeholder="EADGBE" size="10" maxlength="10">
+  <div class="input-group-btn">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>
+    </button>
+    <ul id="tuning-dropdown-menu" class="dropdown-menu dropdown-menu-right" role="menu">
+      {{#each tunings as t}}
+      <li><a href="#" on:click="changeTuning(t)">{{t}}</a></li>
+      {{/each}}
+    </ul>
+  </div>
 </div>
+
+<style>
+  .tuning {
+    float: left;
+    width: 10em;
+  }
+</style>
 <script>
 
   'use strict';
+  import store from "store";
+
   export default {
     data() {
       return {
         tuning: ''
       }
     },
-    oncreate() {
+    computed: {
+      tunings: function (t) {
+        return store.get('tunings')
+      }
     },
-    methods: {}
+
+    oncreate() {
+
+    },
+    methods: {
+      changeTuning: function (tuning) {
+        console.log(tuning);
+        this.set({tuning: tuning});
+        const x = 7;
+      },
+
+      tuning: function () {
+        const tuning = this.get('tuning');
+        if (tuning) {
+          this.addTuning(tuning);
+        }
+        return tuning || 'EADGBE';
+      },
+
+      addTuning: function (tuning) {
+        let tunings = this.get('tunings');
+        if (_.isArray(tunings)) {
+          tunings.push(tuning);
+          store.remove('tunings');
+          store.set('tunings', _.uniq(tunings));
+        } else {
+          store.set('tunings', [tuning]);
+        }
+      }
+    }
   };
 </script>

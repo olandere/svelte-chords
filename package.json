@@ -29,6 +29,7 @@
   "dependencies": {
     "d3": "^4.10.0",
     "lodash": "^4.17.4",
+    "store": "2.0.12",
     "svelte": "^1.25.0",
     "bootstrap": "3.3.x",
     "whatwg-fetch": "^2.0.3"
