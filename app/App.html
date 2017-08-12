@@ -1,48 +1,59 @@
 <div class="container-fluid">
   <h1>Chord charts - beta</h1>
   <!--form novalidate class="form-inline" -->
-  <label title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:
-    <input type="text"
-           id="chordInput"
-           class="form-control"
-           bind:value='chordName'
-           placeholder="Enter chord(s) here"
-           required>
-  </label>
-  <label title="">Fret span: <input type="number"
-                                    class="form-control"
-                                    bind:value='fretSpan'
-                                    value="4"
-                                    placeholder="4"
-                                    min="1"
-                                    max="12"></label>
-  <div class="form-group">
-    <label>Tuning: </label>
-    <Tuning></Tuning>
+  <div class="row">
+    <div class="form-group col-md-2">
+      <label for="chordInput" title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:</label>
+      <input type="text"
+             id="chordInput"
+             class="form-control"
+             bind:value='chordName'
+             placeholder="Enter chord(s) here"
+             required>
+    </div>
+    <div class="form-group col-md-1">
+      <label for="fretSpan" title="">Fret span:</label>
+      <input type="number" id="fretSpan"
+             class="input-mini form-control"
+             bind:value='fretSpan'
+             value="4"
+             placeholder="4"
+             min="1"
+             max="12">
+    </div>
+    <div class="col-md-2">
+      <label>Tuning: </label>
+      <Tuning ref:tuning></Tuning>
+    </div>
+    <a class="form-group col-md-2 col-md-offset-4" href="help.html">How do I use this???</a>
   </div>
-  <div class="checkbox">
-    <label>
-      <input type="checkbox">Shell
-    </label>
+  <div class="row">
+    <div class="form-group col-md-3">
+      <label class="checkbox-inline">
+        <input type="checkbox" bind:checked='shell' value="true">Shell
+      </label>
+      <label class="checkbox-inline">
+        <input type="checkbox" bind:checked='jazz' value="true">Jazz voicings only
+      </label>
+    </div>
+
   </div>
-  <div class="checkbox">
-    <label>
-      <input type="checkbox">Condense
-    </label>
+  <div class="row">
+    <div class="form-group col-md-1">
+      <input type="button" id="submitButton" class="btn btn-primary" value="Submit"
+             on:click="handleSubmit(event)"/>
+    </div>
   </div>
-  <div class="checkbox">
-    <label>
-      <input type="checkbox">Jazz voicings only
-    </label>
-  </div>
-  <input id="submitButton" type="button" class="btn btn-primary" value="Submit" on:click="handleSubmit(event)"/>
-  <a href="help.html">How do I use this???</a>
-  <!--/form-->
-  <hr>
+</div>
+<!--/form-->
+<hr>
+<div class="container-fluid">
   <div id="chordlist">
     <!--ChordList ref:chordlist /-->
   </div>
 </div>
+<hr>
+
 <script>
 
   import ChordList from './ChordList.html';
@@ -56,7 +67,9 @@
     data() {
       return {
         fretSpan: 4,
-        chordName: ''
+        chordName: '',
+        span: false,
+        jazz: false
       };
     },
     components: {
@@ -64,11 +77,10 @@
       Tuning
     },
     oncreate() {
-      // Component initialization happens here, see
       const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
       this.set({cs: cs});
       document.getElementById("chordInput")
-        .addEventListener("keyup", function(event) {
+        .addEventListener("keyup", function (event) {
           event.preventDefault();
           if (event.keyCode == 13) {
             document.getElementById("submitButton").click();
@@ -78,6 +90,7 @@
     methods: {
       handleSubmit: function (event) {
         const _this = this;
+        const tuning = _this.refs.tuning.tuning();
 
         function renderChords(chords) {
           if (_this.chordlist) {
@@ -91,13 +104,20 @@
 
         const firstChar = _this.get('chordName').trim().charAt(0);
         if (firstChar.match(/[abcdefgrs]/i)) {
-          _this.get('cs').chords(this.get('fretSpan'), _this.get('chordName'),
-            'EADGBE', false, false).then(chords => {
-            renderChords(chords);
-          })
+          if (_this.get('shell')) {
+            _this.get('cs').shellchord(_this.get('fretSpan'), _this.get('chordName'),
+              tuning, false, _this.get('jazz')).then(chords => {
+              renderChords(chords);
+            })
+          } else {
+            _this.get('cs').chords(_this.get('fretSpan'), _this.get('chordName'),
+              tuning, false, _this.get('jazz')).then(chords => {
+              renderChords(chords);
+            })
+          }
         } else {
           _this.get('cs').analyze(_this.get('chordName'),
-            'EADGBE').then(chords => {
+            tuning).then(chords => {
             renderChords(chords);
           })
         }
