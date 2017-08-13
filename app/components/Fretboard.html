@@ -8,11 +8,123 @@
     },
     methods: {
       renderData() {
-        const numFrets = 12;
-        const notes = this.get('frets');
+        const numFrets = 13;
+        const frets = this.get('frets');
         const name = this.get('name');
+        const roots = this.get('roots');
 
+        const numStrings = frets.length;
+
+        //Width and height
+        const w = 11 * numStrings;
+        const h = 10 + 10 * numFrets;
+        const padding = 36;
+        const topPad = 25;
+        const bottomPad = 20;
+
+        const stringScale = d3.scaleLinear().domain([0, numStrings - 1]).range([padding / 2, w + padding / 2]);
+        const fretScale = d3.scaleLinear().domain([0, numFrets - 1]).range([topPad, h + topPad]);
+
+        const svg = d3.select(this.refs.fretboard).append('svg').attr('width', w + padding).attr('height', h + topPad + bottomPad);
+
+        const fretboardElem = svg.append('g');
+        fretboardElem.append('text').attr('text-anchor', 'middle').attr('transform', 'translate(0, 12)').attr('x', (w + padding) / 2).attr('y', 0).text(name);
+
+        const stringLines = fretboardElem.append('g').selectAll('line')
+          .data(frets)
+          .enter()
+          .append('line');
+
+        stringLines.attr('x1', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('x2', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('y1', fretScale(0))
+          .attr('y2', fretScale(numFrets - 1))
+          .attr('stroke', 'black');
+
+        const fretLines = fretboardElem.append('g').selectAll('line')
+          .data([1,2,3,4,5,6,7,8,9,10,11,12,13])
+          .enter()
+          .append('line');
+
+        fretLines.attr('y1', function (d, i) {
+            return fretScale(i);
+          })
+          .attr('y2', function (d, i) {
+            return fretScale(i);
+          })
+          .attr('x1', stringScale(0))
+          .attr('x2', stringScale(numStrings - 1))
+          .attr('stroke', 'black')
+          .attr('stroke-width', function (d, i) {
+            if (i === 0) {
+              return 3;
+            } else {
+              return 1;
+            }
+          });
+
+        const dots = fretboardElem.append('g').attr('transform',
+          'translate(0,' + (-h / (2 * (numFrets - 1))) + ')').selectAll('circle')
+          .data(frets)
+          .enter()
+          .append('g').
+          attr('transform', function(d, i) { return 'translate(' + stringScale(i) +", 0)"})
+          ;
+
+        dots.selectAll("g").data(function(d) { return d; }).enter().
+        append('circle')
+          .attr('cy', function (d) {
+            return fretScale(d);
+          }).attr('style', function (d) {
+            if (d !== 0) {
+              return 'fill: black';
+            } else {
+              return 'fill: white';
+            }
+          })
+          .attr('stroke', 'black')
+          .attr('r', function (d) {
+            return 4;
+          });
+
+        const scaleroots = fretboardElem.append('g').attr('transform',
+          'translate(0,' + (-h / (2 * (numFrets - 1))) + ')').selectAll('circle').data(roots).enter().append('circle');
+
+        scaleroots.attr('cx', function (d, i) {
+            return stringScale(i);
+          })
+          .attr('cy', function (d) {
+            return fretScale(d);
+          }).attr('style', function (d, i) {
+            if (d !== 0) {
+              return 'stroke: white';
+            } else {
+              return 'fill: black';
+            }
+          })
+          .attr('stroke', 'black')
+          .attr('r', function (d) {
+            if (d===0)
+              return 2;
+            else return 3;
+          });
+
+
+        fretboardElem.append('g').selectAll('text').data([5,7,9,12]).enter().append('text').
+        text(function(d) {return d;}).attr('y', function(d){return fretScale(d)}).attr('x', function (d) {
+            if (d < 10) {
+              return 13;
+            } else {
+              return 14;
+            }
+          })
+          .attr('text-anchor', 'end');
       }
+
     }
   };
 </script>

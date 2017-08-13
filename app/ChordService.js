@@ -37,5 +37,12 @@ export default class ChordService {
       jazz: jazz
 		})).then(r => r.json());
 	}
+
+  arpeggio(chord, tuning) {
+    return fetch(this.base + '/arpeggio' + '?' + this.serialize({
+      chord: encodeURIComponent(chord.trim()),
+      tuning: tuning
+    })).then(r => r.json());
+  }
 	
 }

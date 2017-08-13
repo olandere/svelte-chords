@@ -48,6 +48,8 @@
 <!--/form-->
 <hr>
 <div class="container-fluid">
+  <div id="spinner"></div>
+  <div id="fretboard"></div>
   <div id="chordlist">
     <!--ChordList ref:chordlist /-->
   </div>
@@ -59,9 +61,11 @@
   import ChordList from './components/ChordList.html';
   import ChordService from './ChordService';
   import Tuning from './components/Tuning.html';
+  import Fretboard from './components/Fretboard.html';
   import './app.css';
   import 'bootstrap';
   import 'bootstrap/dist/css/bootstrap.css';
+  import Spinner from 'spin';
 
   export default {
     data() {
@@ -74,53 +78,96 @@
     },
     components: {
       ChordList,
-      Tuning
+      Tuning,
+      Fretboard
     },
     oncreate() {
-      const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
+      //const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
+      const cs = new ChordService("http://localhost:8080");
       this.set({cs: cs});
+
+      const spinner = new Spinner({lines: 11, length: 0, width: 14, radius: 28, opacity:0.05});
+      this.set({spinner: spinner});
+
+      const _this = this;
       document.getElementById("chordInput")
         .addEventListener("keyup", function (event) {
           event.preventDefault();
-          if (event.keyCode == 13) {
+          if (event.keyCode === 13) {
             document.getElementById("submitButton").click();
           }
         });
+      document.getElementById("chordInput").addEventListener("keyup", function (event) {
+          const name = _this.get('chordName').replace(/b/g, '\u266D').replace(/#/g, '\u266F');
+          _this.set({chordName: name});
+        }
+      );
     },
     methods: {
       handleSubmit: function (event) {
         const _this = this;
         const tuning = _this.refs.tuning.tuning();
+        const spinner =  _this.get('spinner');
 
-        function renderChords(chords) {
+
+        function cleardisplay() {
           if (_this.chordlist) {
             _this.chordlist.destroy();
           }
+          if (_this.fretboard) {
+            _this.fretboard.destroy();
+          }
+          spinner.spin(document.getElementById("spinner"));
+        }
+
+        function renderChords(chords) {
           _this.chordlist = new ChordList({
             target: document.getElementById('chordlist')
           });
           _this.chordlist.set({chords: chords});
         }
 
+        function renderFretboard(frets) {
+          _this.fretboard = new Fretboard({
+            target: document.getElementById('fretboard'),
+           // data: {frets: [[0,5,8,12],[0,3,7,12],[2,7,10],[2,5,9],[1,5,10],[0,5,8,12]],name:"Am"}
+            data: frets
+          });
+    //      _this.fretboard.set()
+        }
+
+        cleardisplay();
         const firstChar = _this.get('chordName').trim().charAt(0);
         if (firstChar.match(/[abcdefgrs]/i)) {
           if (_this.get('shell')) {
             _this.get('cs').shellchord(_this.get('fretSpan'), _this.get('chordName'),
               tuning, false, _this.get('jazz')).then(chords => {
+              spinner.stop();
               renderChords(chords);
             })
           } else {
             _this.get('cs').chords(_this.get('fretSpan'), _this.get('chordName'),
               tuning, false, _this.get('jazz')).then(chords => {
+              spinner.stop();
               renderChords(chords);
             })
           }
+          _this.get('cs').arpeggio(_this.get('chordName'),
+            tuning).then(frets => {
+            renderFretboard(frets)
+          });
         } else {
           _this.get('cs').analyze(_this.get('chordName'),
             tuning).then(chords => {
+            spinner.stop();
             renderChords(chords);
+            _this.get('cs').arpeggio(chords.chordList[0].name,
+              tuning).then(frets => {
+              renderFretboard(frets)
+            });
           })
         }
+
       }
     }
   };
