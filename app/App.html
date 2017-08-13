@@ -49,7 +49,7 @@
 <hr>
 <div class="container-fluid">
   <div id="spinner"></div>
-  <div id="fretboard"></div>
+  <div id="fretboardList"></div>
   <div id="chordlist">
     <!--ChordList ref:chordlist /-->
   </div>
@@ -61,7 +61,7 @@
   import ChordList from './components/ChordList.html';
   import ChordService from './ChordService';
   import Tuning from './components/Tuning.html';
-  import Fretboard from './components/Fretboard.html';
+  import FretboardList from './components/FretboardList.html';
   import './app.css';
   import 'bootstrap';
   import 'bootstrap/dist/css/bootstrap.css';
@@ -79,7 +79,7 @@
     components: {
       ChordList,
       Tuning,
-      Fretboard
+      FretboardList
     },
     oncreate() {
       //const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
@@ -122,14 +122,14 @@
 
         function renderChords(chords) {
           _this.chordlist = new ChordList({
-            target: document.getElementById('chordlist')
+            target: document.getElementById('chordlist'),
+            data: chords
           });
-          _this.chordlist.set({chords: chords});
         }
 
         function renderFretboard(frets) {
-          _this.fretboard = new Fretboard({
-            target: document.getElementById('fretboard'),
+          _this.fretboard = new FretboardList({
+            target: document.getElementById('fretboardList'),
            // data: {frets: [[0,5,8,12],[0,3,7,12],[2,7,10],[2,5,9],[1,5,10],[0,5,8,12]],name:"Am"}
             data: frets
           });
@@ -161,7 +161,7 @@
             tuning).then(chords => {
             spinner.stop();
             renderChords(chords);
-            _this.get('cs').arpeggio(chords.chordList[0].name,
+            _this.get('cs').arpeggio(_.map(chords.chordList, c => c.name),
               tuning).then(frets => {
               renderFretboard(frets)
             });

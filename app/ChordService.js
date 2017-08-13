@@ -40,7 +40,7 @@ export default class ChordService {
 
   arpeggio(chord, tuning) {
     return fetch(this.base + '/arpeggio' + '?' + this.serialize({
-      chord: encodeURIComponent(chord.trim()),
+      chord: encodeURIComponent(chord),
       tuning: tuning
     })).then(r => r.json());
   }

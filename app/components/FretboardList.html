@@ -1,0 +1,23 @@
+<div class='fretboard-list'>
+  <!--Chord name='C' chord='["x", 3, 2, 0, 1, 0]' degrees='["x", "R", "3", "5", "R", "3"]' notes='[]'-->
+  {{#each arpeggioList as arp}}
+  <Fretboard name='{{arp.name}}' frets='{{arp.frets}}' roots='{{arp.roots}}'></Fretboard>
+  {{/each}}
+</div>
+
+<script>
+  import Fretboard from './Fretboard.html';
+
+  export default {
+    data() {
+      return {
+        frets: {
+          arpeggioList: []
+        }
+      };
+    },
+    components: {
+      Fretboard
+    },
+  };
+</script>
