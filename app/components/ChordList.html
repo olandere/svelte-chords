@@ -1,6 +1,6 @@
 <div class='chord-list'>
 	<!--Chord name='C' chord='["x", 3, 2, 0, 1, 0]' degrees='["x", "R", "3", "5", "R", "3"]' notes='[]'-->
-	{{#each chords.chordList as chord}}
+	{{#each chordList as chord}}
 	<Chord name='{{chord.name}}' chord='{{chord.frets}}' degrees='{{chord.degrees}}' notes='{{chord.notes}}'></Chord>
 	{{/each}}
 </div>
@@ -11,9 +11,7 @@
   export default {
     data() {
       return {
-        chords: {
-          chordList: []
-        }
+        chordList: []
       };
     },
     components: {
