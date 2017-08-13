@@ -25,22 +25,24 @@
         const stringScale = d3.scaleLinear().domain([0, numStrings - 1]).range([padding / 2, w + padding / 2]);
         const fretScale = d3.scaleLinear().domain([0, numFrets - 1]).range([topPad, h + topPad]);
 
-        const svg = d3.select(this.refs.fretboard).append('svg').attr('width', w + padding).attr('height', h + topPad + bottomPad);
+        const svg = d3.select(this.refs.fretboard).append('svg')
+          .attr('width', w + padding)
+          .attr('height', h + topPad + bottomPad);
 
         const fretboardElem = svg.append('g');
-        fretboardElem.append('text').attr('text-anchor', 'middle').attr('transform', 'translate(0, 12)').attr('x', (w + padding) / 2).attr('y', 0).text(name);
+        fretboardElem.append('text')
+          .attr('text-anchor', 'middle')
+          .attr('transform', 'translate(0, 12)')
+          .attr('x', (w + padding) / 2)
+          .attr('y', 0).text(name);
 
         const stringLines = fretboardElem.append('g').selectAll('line')
           .data(frets)
           .enter()
           .append('line');
 
-        stringLines.attr('x1', function (d, i) {
-            return stringScale(i);
-          })
-          .attr('x2', function (d, i) {
-            return stringScale(i);
-          })
+        stringLines.attr('x1', (d, i) => stringScale(i))
+          .attr('x2', (d, i) => stringScale(i))
           .attr('y1', fretScale(0))
           .attr('y2', fretScale(numFrets - 1))
           .attr('stroke', 'black');
@@ -50,78 +52,40 @@
           .enter()
           .append('line');
 
-        fretLines.attr('y1', function (d, i) {
-            return fretScale(i);
-          })
-          .attr('y2', function (d, i) {
-            return fretScale(i);
-          })
+        fretLines.attr('y1', (d, i) => fretScale(i))
+          .attr('y2', (d, i) => fretScale(i))
           .attr('x1', stringScale(0))
           .attr('x2', stringScale(numStrings - 1))
           .attr('stroke', 'black')
-          .attr('stroke-width', function (d, i) {
-            if (i === 0) {
-              return 3;
-            } else {
-              return 1;
-            }
-          });
+          .attr('stroke-width', (d, i) => (i === 0) ? 3 : 1);
 
-        const dots = fretboardElem.append('g').attr('transform',
-          'translate(0,' + (-h / (2 * (numFrets - 1))) + ')').selectAll('circle')
+        const dots = fretboardElem.append('g')
+          .attr('transform', `translate(0, ${(-h / (2 * (numFrets - 1)))})`).selectAll('circle')
           .data(frets)
           .enter()
-          .append('g').
-          attr('transform', function(d, i) { return 'translate(' + stringScale(i) +", 0)"})
-          ;
+          .append('g')
+          .attr('transform', (d, i) => `translate(${stringScale(i)} 0)`);
 
-        dots.selectAll("g").data(function(d) { return d; }).enter().
+        dots.selectAll("g").data(d => d).enter().
         append('circle')
-          .attr('cy', function (d) {
-            return fretScale(d);
-          }).attr('style', function (d) {
-            if (d !== 0) {
-              return 'fill: black';
-            } else {
-              return 'fill: white';
-            }
-          })
+          .attr('cy', d => fretScale(d))
+          .attr('style', d => (d !== 0) ? 'fill: black': 'fill: white')
           .attr('stroke', 'black')
-          .attr('r', function (d) {
-            return 4;
-          });
+          .attr('r', 4);
 
-        const scaleroots = fretboardElem.append('g').attr('transform',
-          'translate(0,' + (-h / (2 * (numFrets - 1))) + ')').selectAll('circle').data(roots).enter().append('circle');
+        const scaleroots = fretboardElem.append('g')
+          .attr('transform', `translate(0, ${(-h / (2 * (numFrets - 1)))})`)
+          .selectAll('circle').data(roots).enter().append('circle');
 
-        scaleroots.attr('cx', function (d, i) {
-            return stringScale(i);
-          })
-          .attr('cy', function (d) {
-            return fretScale(d);
-          }).attr('style', function (d, i) {
-            if (d !== 0) {
-              return 'stroke: white';
-            } else {
-              return 'fill: black';
-            }
-          })
+        scaleroots.attr('cx', (d, i) => stringScale(i))
+          .attr('cy', d => fretScale(d))
+          .attr('style', d => (d !== 0) ? 'stroke: white' : 'fill: black')
           .attr('stroke', 'black')
-          .attr('r', function (d) {
-            if (d===0)
-              return 2;
-            else return 3;
-          });
+          .attr('r', d => (d === 0) ? 2 : 3);
 
 
         fretboardElem.append('g').selectAll('text').data([5,7,9,12]).enter().append('text').
-        text(function(d) {return d;}).attr('y', function(d){return fretScale(d)}).attr('x', function (d) {
-            if (d < 10) {
-              return 13;
-            } else {
-              return 14;
-            }
-          })
+        text(d => d).attr('y', d => fretScale(d)).attr('x', d => (d < 10) ? 13 : 14)
           .attr('text-anchor', 'end');
       }
 

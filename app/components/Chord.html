@@ -58,22 +58,19 @@
         }
 
         const chordElem = svg.append('g');
-        chordElem.append('text').attr('text-anchor', 'middle').attr('transform', 'translate(0, 12)').attr('x',
-          (w + padding) /
-          2).attr('y',
-          0).text(name);
+        chordElem.append('text').attr('text-anchor', 'middle')
+          .attr('transform', 'translate(0, 12)')
+          .attr('x', (w + padding) / 2)
+          .attr('y', 0)
+          .text(name);
 
         const stringLines = chordElem.append('g').selectAll('line')
           .data(chord)
           .enter()
           .append('line');
 
-        stringLines.attr('x1', function (d, i) {
-            return stringScale(i);
-          })
-          .attr('x2', function (d, i) {
-            return stringScale(i);
-          })
+        stringLines.attr('x1', (d, i) => stringScale(i))
+          .attr('x2', (d, i) => stringScale(i))
           .attr('y1', fretScale(0))
           .attr('y2', fretScale(numFrets - 1))
           .attr('stroke', 'black');
@@ -83,78 +80,41 @@
           .enter()
           .append('line');
 
-        fretLines.attr('y1', function (d, i) {
-            return fretScale(i);
-          })
-          .attr('y2', function (d, i) {
-            return fretScale(i);
-          })
+        fretLines.attr('y1', (d, i) => fretScale(i))
+          .attr('y2', (d, i) => fretScale(i))
           .attr('x1', stringScale(0))
           .attr('x2', stringScale(numStrings - 1))
           .attr('stroke', 'black')
-          .attr('stroke-width', function (d, i) {
-            if (i == 0 && fretAdj == 0) {
-              return 3;
-            } else {
-              return 1;
-            }
-          });
+          .attr('stroke-width', (d, i) => (i === 0 && fretAdj === 0) ? 3 : 1);
 
-        const dots = chordElem.append('g').attr('transform',
-          'translate(0,' + (-h / (2 * (numFrets - 1))) + ')').selectAll('circle')
+        const dots = chordElem.append('g')
+          .attr('transform', `translate(0, ${(-h / (2 * (numFrets - 1)))})`)
+          .selectAll('circle')
           .data(chord)
           .enter()
           .append('circle');
 
-        dots.attr('cx', function (d, i) {
-            return stringScale(i);
-          })
-          .attr('cy', function (d) {
-            if (d == 'x') {
-              return 0;
-            }
-
-            return (d === 0) ? fretScale(0) : fretScale(d + fretAdj);
-          }).attr('style', function (d, i) {
-            if (d !== 0) {
-              return 'fill: black';
-            } else {
-              return 'fill: white';
-            }
-          })
+        dots.attr('cx', (d, i) => stringScale(i))
+          .attr('cy', d => (d == 'x') ? 0: (d === 0) ? fretScale(0) : fretScale(d + fretAdj))
+          .attr('style', (d, i) => (d !== 0) ? 'fill: black' : 'fill: white')
           .attr('stroke', 'black')
-          .attr('r', function (d) {
-            if (d === 'x') {
-              return 0;
-            } else {
-              return 4;
-            }
-          });
+          .attr('r', d => (d === 'x') ? 0 : 4);
 
-        const crosses = chordElem.append('g').attr('transform', 'translate(0, -2)').selectAll('text')
+        const crosses = chordElem.append('g')
+          .attr('transform', 'translate(0, -2)').selectAll('text')
           .data(chord)
           .enter()
           .append('text');
 
-        crosses.attr('x', function (d, i) {
-            return stringScale(i);
-          })
+        crosses.attr('x', (d, i) => stringScale(i))
           .attr('y', fretScale(0))
           .attr('text-anchor', 'middle')
-          .text(function (d) {
-            if (d === 'x') {
-              return '\u00D7';
-            }
-          });
+          .text(d => (d === 'x') ? '\u00D7' : '');
 
         if (fretMarker > 0) {
-          chordElem.append('g').append('text').text(fretMarker).attr('y', fretScale(1)).attr('x', function () {
-              if (fretMarker < 10) {
-                return 13;
-              } else {
-                return 14;
-              }
-            })
+          chordElem.append('g').append('text').text(fretMarker)
+            .attr('y', fretScale(1))
+            .attr('x', () => (fretMarker < 10) ? 13 : 14)
             .attr('text-anchor', 'end');
         }
 
@@ -164,20 +124,12 @@
           .enter()
           .append('text');
 
-        chordDegrees.attr('x', function (d, i) {
-            return stringScale(i);
-          })
+        chordDegrees.attr('x', (d, i) => stringScale(i))
           .attr('y', fretScale(numFrets))
           .attr('text-anchor', 'middle')
           .attr("lengthAdjust", "spacing")
           .attr("textLength", stringScale(1) - stringScale(0))
-          .text(function (d) {
-            if (d === 'x') {
-              return '\u00D7'
-            } else {
-              return d;
-            }
-          });
+          .text(d => (d === 'x') ? '\u00D7' : d);
       }
     }
   };
