@@ -4,6 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 process.traceDeprecation = true;
 
 module.exports = {
+  cache: true,
+  devtool: 'source-map',
   entry: ["whatwg-fetch", "./app/main.js"],
   resolve: {
     extensions: ['.js', '.html', '.css']
@@ -13,7 +15,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   plugins: [
-    //new webpack.optimize.UglifyJsPlugin(),
+    new webpack.optimize.UglifyJsPlugin({ sourceMap: true }),
     new HtmlWebpackPlugin({title: 'Chord Charts'}),
     new webpack.ProvidePlugin({
       d3: 'd3',
