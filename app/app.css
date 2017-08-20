@@ -55,3 +55,28 @@ g>circle {
     margin-left: 5px;
   }
 }
+
+.logo {
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: contain;
+  height: 50px;
+}
+#d3-img {
+  background-image: url(images/d3js.svg);
+}
+#scala-img {
+  background-image: url(images/Scala_logo_transparent.png);
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: contain;
+  height: 50px;
+}
+#scalatra-img {
+  background-image: url(images/Scalatra_Logo.png);
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: contain;
+  height: 50px;
+}
+

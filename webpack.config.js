@@ -6,6 +6,11 @@ process.traceDeprecation = true;
 module.exports = {
   cache: true,
   devtool: 'source-map',
+  devServer: {
+    contentBase: path.join(__dirname, "dist"),
+    compress: true,
+    port: 9000
+  },
   entry: ["whatwg-fetch", "./app/main.js"],
   resolve: {
     extensions: ['.js', '.html', '.css']

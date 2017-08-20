@@ -5,7 +5,8 @@
   "main": "Chord.js",
   "scripts": {
     "test": "jest",
-    "build": "webpack"
+    "build": "webpack",
+    "start": "webpack-dev-server --open"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +26,8 @@
     "style-loader": "^0.18.2",
     "svelte-loader": "^2.0.1",
     "uglifyjs-webpack-plugin": "^0.2.2",
-    "webpack": "^2.7.0"
+    "webpack": "^2.7.0",
+    "webpack-dev-server": "^2.7.1"
   },
   "dependencies": {
     "bootstrap": "3.3.x",
