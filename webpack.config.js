@@ -11,7 +11,7 @@ module.exports = {
     compress: true,
     port: 9000
   },
-  entry: ["whatwg-fetch", "./app/main.js"],
+  entry: ["./app/main.js"],
   resolve: {
     extensions: ['.js', '.html', '.css']
   },
