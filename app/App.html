@@ -1,7 +1,9 @@
 <div class="container-fluid">
   <div class="row">
   <h1 class="col-md-4">Chord Charts - beta</h1>
-    <button id="helpBtn" type="button" class="form-group col-md-2 col-md-offset-6 btn btn-link" data-toggle="modal" data-target="#helpModal"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Help me use this</button>
+    <button id="helpBtn" type="button" class="form-group col-md-2 col-md-offset-6 btn btn-link"
+            data-toggle="modal" data-target="#helpModal"><span class="glyphicon glyphicon-info-sign"
+                                                               aria-hidden="true"></span> Help me use this</button>
   </div>
   <!--form novalidate class="form-inline" -->
   <div class="row">
@@ -101,8 +103,9 @@
       Help
     },
     oncreate() {
-      //const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
-      const cs = new ChordService("http://localhost:8080");
+    //  const cs = new ChordService("http://default-environment-bi6eqhhyfr.elasticbeanstalk.com");
+     // const cs = new ChordService("http://localhost:8080");
+      const cs = new ChordService(".");
       this.set({cs: cs});
 
       const spinner = new Spinner({lines: 11, length: 0, width: 14, radius: 28, opacity: 0.05});

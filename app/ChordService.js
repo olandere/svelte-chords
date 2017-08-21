@@ -1,48 +1,57 @@
 'use strict';
-import 'whatwg-fetch';
+import axios from 'axios';
 
 export default class ChordService {
 	constructor(base) {
 		this.base = base;
 	}
-	
-	serialize(data) {
-		return Object.keys(data).map(keyName => encodeURIComponent(keyName) + '=' + encodeURIComponent(data[keyName])).join('&');
-	}
-	
-	analyze(fingering, tuning) {
-		return fetch(this.base + '/analyze/' + encodeURIComponent(fingering.trim()) + "?" + this.serialize({
-      chord: encodeURIComponent(fingering.trim()),
-      tuning: tuning,
-      condense: false,
-      jazz: false
-		})).then(r => r.json());
-	}
-	
-	shellchord(fretspan, chord, tuning, condense, jazz) {
-		return fetch(this.base +'/shellchord/' + fretspan + '?' + this.serialize({
-      chord: encodeURIComponent(chord.trim()),
-      tuning: tuning,
-      condense: condense,
-      jazz: jazz
-		})
-		).then(r => r.json());
-	}
+
+  analyze(fingering, tuning) {
+    return axios.get(`${this.base}/analyze/${encodeURIComponent(fingering.trim())}`,
+      {
+        // headers: {
+        //   'Access-Control-Allow-Origin': '*',
+        // },
+        params: {
+          chord: encodeURIComponent(fingering.trim()),
+          tuning: tuning,
+          condense: false,
+          jazz: false
+        }
+      }
+    ).then(r => r.data).catch(r => alert(r));
+  }
+
+  shellchord(fretspan, chord, tuning, condense, jazz) {
+    return axios.get(`${this.base}/shellchord/${fretspan}`, {
+        params: {
+          chord: encodeURIComponent(chord.trim()),
+          tuning: tuning,
+          condense: false,
+          jazz: jazz
+        }
+      }
+    ).then(r => r.data).catch(r => alert(r));
+  }
 	
  chords(fretspan, chord, tuning, condense, jazz) {
-		return fetch(this.base +'/chords/' + fretspan + '?' + this.serialize({
-      chord: encodeURIComponent(chord.trim()),
-      tuning: tuning,
-      condense: condense,
-      jazz: jazz
-		})).then(r => r.json());
+   return axios.get(`${this.base}/chords/${fretspan}`, {
+     params: {
+       chord: encodeURIComponent(chord.trim()),
+       tuning: tuning,
+       condense: false,
+       jazz: jazz
+     }
+   }).then(r => r.data).catch(r => alert(r));
 	}
 
   arpeggio(chord, tuning) {
-    return fetch(this.base + '/arpeggio' + '?' + this.serialize({
-      chord: encodeURIComponent(chord),
-      tuning: tuning
-    })).then(r => r.json());
+    return axios.get(`${this.base}/arpeggio`, {
+      params: {
+        chord: encodeURIComponent(chord),
+        tuning: tuning
+      }
+    }).then(r => r.data).catch(r => alert(r));
   }
 	
 }
