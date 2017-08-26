@@ -1,0 +1,168 @@
+<!--form novalidate class="form-inline" -->
+<div class="row">
+  <div class="form-group col-md-2">
+    <label for="chordInput" title="Examples: CM7, Aadd9, F&#x266f;m7&#x266d;5, x 0 2 2 1 0">Chord:</label>
+    <input type="text"
+           on:input="handleChordChange(event)"
+           id="chordInput"
+           class="form-control"
+           bind:value='chordName'
+           placeholder="Enter chord(s) here"
+           required>
+  </div>
+  <div class="form-group col-md-1">
+    <label for="fretSpan" title="">Fret span:</label>
+    <input type="number" id="fretSpan"
+           class="input-mini form-control"
+           bind:value='fretSpan'
+           value="4"
+           placeholder="4"
+           min="1"
+           max="12">
+  </div>
+  <div class="col-md-2">
+    <label>Tuning: </label>
+    <Tuning ref:tuning></Tuning>
+  </div>
+
+</div>
+<div class="row">
+  <div class="form-group col-md-3">
+    <label class="checkbox-inline">
+      <input type="checkbox" bind:checked='shell' value="true">Shell
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" bind:checked='jazz' value="true">Jazz voicings only
+    </label>
+  </div>
+
+</div>
+<div class="row">
+  <div class="form-group col-md-1">
+    <input type="button" ref:submitButton id="submitButton" class="btn btn-primary" value="Submit"
+           on:click="handleSubmit(event)"/>
+  </div>
+</div>
+
+<script>
+  'use strict';
+
+  import ChordList from './ChordList.html';
+  import ChordService from '../ChordService';
+  import FretboardList from './FretboardList.html';
+  import Spinner from 'spin';
+  import Tuning from './Tuning.html';
+
+  export default {
+    data() {
+      return {
+        fretSpan: 4,
+        chordName: '',
+        span: false,
+        jazz: false
+      };
+    },
+    components: {
+      ChordList,
+      FretboardList,
+      Tuning
+    },
+    oncreate() {
+      const cs = new ChordService("http://localhost:8080");
+     // const cs = new ChordService(".");
+      this.set({cs: cs});
+      const spinner = new Spinner({lines: 11, length: 0, width: 14, radius: 28, opacity: 0.05});
+      this.set({spinner: spinner});
+
+      this.refs.submitButton.disabled = true;
+      document.getElementById("chordInput")
+        .addEventListener("keyup", function (event) {
+          event.preventDefault();
+          if (event.keyCode === 13) {
+            document.getElementById("submitButton").click();
+          }
+        });
+    },
+    methods: {
+      transformSymbols: function (s) {
+        return s.replace(/b/g, '\u266D').replace(/#/g, '\u266F');
+      },
+      handleSubmit: function (event) {
+        const _this = this;
+        const tuning = _this.refs.tuning.tuning();
+        const spinner = _this.get('spinner');
+
+
+        function cleardisplay() {
+          if (_this.chordlist) {
+            _this.chordlist.destroy();
+          }
+          if (_this.fretboard) {
+            _this.fretboard.destroy();
+          }
+          spinner.spin(document.getElementById("spinner"));
+        }
+
+        function renderChords(chords) {
+          _this.chordlist = new ChordList({
+            target: document.getElementById('chordlist'),
+            data: chords
+          });
+        }
+
+        function renderFretboard(frets) {
+          _this.fretboard = new FretboardList({
+            target: document.getElementById('fretboardList'),
+            // data: {frets: [[0,5,8,12],[0,3,7,12],[2,7,10],[2,5,9],[1,5,10],[0,5,8,12]],name:"Am"}
+            data: frets
+          });
+          //      _this.fretboard.set()
+        }
+
+        cleardisplay();
+        const firstChar = _this.get('chordName').trim().charAt(0);
+        if (firstChar.match(/[abcdefgrs]/i)) {
+          if (_this.get('shell')) {
+            _this.get('cs').shellchord(_this.get('fretSpan'), _this.get('chordName'),
+              tuning, false, _this.get('jazz')).then(chords => {
+              spinner.stop();
+              renderChords(chords);
+            })
+          } else {
+            _this.get('cs').chords(_this.get('fretSpan'), _this.get('chordName'),
+              tuning, false, _this.get('jazz')).then(chords => {
+              spinner.stop();
+              renderChords(chords);
+            })
+          }
+          _this.get('cs').arpeggio(_this.get('chordName'),
+            tuning).then(frets => {
+            renderFretboard(frets)
+          });
+        } else {
+          _this.get('cs').analyze(_this.get('chordName'),
+            tuning).then(chords => {
+            spinner.stop();
+            renderChords(chords);
+            _this.get('cs').arpeggio(_.map(chords.chordList, c => c.name),
+              tuning).then(frets => {
+              renderFretboard(frets)
+            });
+          })
+        }
+
+      },
+      handleChordChange: function (event) {
+        const chordName = this.get('chordName');
+        if (!_.isEmpty(chordName)) {
+          if (_.includes(chordName, "b") || _.includes(chordName, "#")) {
+            this.set({chordName: this.transformSymbols(chordName)});
+          }
+          this.refs.submitButton.disabled = false;
+        } else {
+          this.refs.submitButton.disabled = true;
+        }
+      }
+    }
+  }
+</script>
