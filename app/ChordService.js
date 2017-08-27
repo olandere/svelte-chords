@@ -53,5 +53,15 @@ export default class ChordService {
       }
     }).then(r => r.data).catch(r => alert(r));
   }
+
+  scale(root, scale, tuning) {
+    return axios.get(`${this.base}/scale`, {
+      params: {
+        root: encodeURIComponent(root),
+        scale: scale,
+        tuning: tuning
+      }
+    }).then(r => r.data).catch(r => alert(r));
+  }
 	
 }
