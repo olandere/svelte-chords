@@ -1,13 +1,23 @@
 <div class="container-fluid">
   <div class="row">
-  <h1 class="col-md-4">Chord Charts - beta</h1>
+    <h1 class="col-md-4">Chord Charts - beta</h1>
     <button id="helpBtn" type="button" class="form-group col-md-2 col-md-offset-6 btn btn-link"
             data-toggle="modal" data-target="#helpModal"><span class="glyphicon glyphicon-info-sign"
-                                                               aria-hidden="true"></span> Help me use this</button>
+                                                               aria-hidden="true"></span> Help me use this
+    </button>
   </div>
-
-
-<ChordInput></ChordInput>
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#chordTab">Chords</a></li>
+    <li class="nav"><a data-toggle="tab" href="#scaleTab">Scales</a></li>
+  </ul>
+  <div class="tab-content">
+    <div id="chordTab" class="tab-pane fade in active">
+      <ChordInput></ChordInput>
+    </div>
+    <div id="scaleTab" class="tab-pane fade">
+      <ScaleInput></ScaleInput>
+    </div>
+  </div>
 </div>
 <Help></Help>
 <hr>
@@ -34,6 +44,7 @@
 <script>
 
   import ChordInput from './components/ChordInput.html';
+  import ScaleInput from './components/ScaleInput.html';
   import Help from './components/Help.html'
 
   import './app.css';
@@ -43,7 +54,8 @@
   export default {
     components: {
       ChordInput,
-      Help
+      Help,
+      ScaleInput
     },
     oncreate() {
     }

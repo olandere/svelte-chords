@@ -1,0 +1,113 @@
+<div class="row">
+  <div class="form-group col-md-2">
+    <label for="scaleInput" title="Examples: C major, G mixolydian, C 1 2">Scale:</label>
+    <input type="text"
+           on:input="handleScaleChange(event)"
+           id="scaleInput"
+           class="form-control"
+           bind:value='scaleName'
+           placeholder="Enter scale here"
+           required>
+  </div>
+  <div class="col-md-2">
+    <label>Tuning: </label>
+    <Tuning ref:scaleTuning></Tuning>
+  </div>
+</div>
+<div class="row">
+  <div class="form-group col-md-1">
+    <input type="button" ref:scaleSubmitButton id="scaleSubmitButton" class="btn btn-primary" value="Submit"
+           on:click="handleSubmit(event)"/>
+  </div>
+</div>
+
+<script>
+  'use strict';
+
+  import ChordService from '../ChordService';
+  import FretboardList from './FretboardList.html';
+  import Spinner from 'spin';
+  import Tuning from './Tuning.html';
+  import Awesomplete from 'awesomplete';
+  import 'awesomplete/awesomplete.css';
+
+  export default {
+    data() {
+      return {
+        scaleName: ''
+      }
+    },
+    components: {
+      FretboardList,
+      Tuning
+    },
+    oncreate() {
+      const rootMatcher = /([acdefgABCDEFG][b#\u266D\u266F]?)/;
+      const cs = new ChordService("http://localhost:8080");
+      // const cs = new ChordService(".");
+      this.set({cs: cs, rootMatcher: rootMatcher});
+      this.refs.scaleSubmitButton.disabled = true;
+      const _this = this;
+
+      document.getElementById("scaleInput")
+        .addEventListener("keyup", function (event) {
+          event.preventDefault();
+          if (event.keyCode === 13) {
+            document.getElementById("scaleSubmitButton").click();
+          }
+        });
+
+      new Awesomplete(document.getElementById("scaleInput"), {
+        list: ["Major", "Harmonic Minor", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian",
+          "Phrygian Dominant", "Double Harmonic", "Lydian Dominant", "Super Locrian", "Minor Pentatonic",
+          "Major Pentatonic"
+        ],
+        data: function (text, input) {
+          return input.slice(0, input.indexOf(" ")) + " " + text;
+        },
+        filter: Awesomplete.FILTER_STARTSWITH,
+        replace: function(text) {
+          _this.set({scaleName: text})
+        }
+      });
+    },
+    methods: {
+      transformSymbols: function (s) {
+        return s.replace(/b/g, '\u266D').replace(/#/g, '\u266F');
+      },
+      handleSubmit: function (event) {
+
+        function renderFretboard(frets) {
+          _this.fretboard = new FretboardList({
+            target: document.getElementById('fretboardList'),
+            // data: {frets: [[0,5,8,12],[0,3,7,12],[2,7,10],[2,5,9],[1,5,10],[0,5,8,12]],name:"Am"}
+            data: frets
+          });
+          //      _this.fretboard.set()
+        }
+
+        const _this = this;
+        const tuning = _this.refs.scaleTuning.tuning();
+
+        const root = _this.get('rootMatcher').exec(_this.get('scaleName').trim())[0];
+        console.log(root);
+        const scale = _this.get('scaleName').trim().slice(root.length).trim();
+        console.log(scale);
+        _this.get('cs').scale(root, scale, tuning).then(scale => {
+          renderFretboard(scale)
+        });
+      },
+      handleScaleChange: function (event) {
+        const scaleName = this.get('scaleName');
+        if (!_.isEmpty(scaleName)) {
+          if (_.includes(scaleName, "b") || _.includes(scaleName, "#")) {
+            this.set({scaleName: this.transformSymbols(scaleName)});
+          }
+          this.refs.scaleSubmitButton.disabled = false;
+        } else {
+          this.refs.scaleSubmitButton.disabled = true;
+        }
+      }
+    }
+  }
+</script>
