@@ -42,6 +42,10 @@
     <input type="button" ref:submitButton id="submitButton" class="btn btn-primary" value="Submit"
            on:click="handleSubmit(event)"/>
   </div>
+  <div class="form-group col-md-1">
+    <input type="button" ref:clearButton id="clearButton" class="btn btn-default" value="Clear"
+           on:click="handleClear(event)"/>
+  </div>
 </div>
 
 <script>
@@ -87,19 +91,26 @@
       transformSymbols: function (s) {
         return s.replace(/b/g, '\u266D').replace(/#/g, '\u266F');
       },
+      cleardisplay: function () {
+        if (this.chordlist) {
+          this.chordlist.destroy();
+        }
+        if (this.fretboard) {
+          this.fretboard.destroy();
+        }
+      },
+      handleClear: function (event) {
+        this.cleardisplay();
+        this.set({chordName: ""});
+        this.refs.submitButton.disabled = true;
+      },
       handleSubmit: function (event) {
         const _this = this;
         const tuning = _this.refs.tuning.tuning();
         const spinner = _this.get('spinner');
 
-
         function cleardisplay() {
-          if (_this.chordlist) {
-            _this.chordlist.destroy();
-          }
-          if (_this.fretboard) {
-            _this.fretboard.destroy();
-          }
+          _this.cleardisplay();
           spinner.spin(document.getElementById("spinner"));
         }
 
