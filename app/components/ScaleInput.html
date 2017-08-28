@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="form-group col-md-2">
+  <div id="scaleRow" class="form-group col-md-2">
     <label for="scaleInput" title="Examples: C major, G mixolydian, C 1 2">Scale:</label>
     <input type="text"
            on:input="handleScaleChange(event)"
@@ -18,6 +18,10 @@
   <div class="form-group col-md-1">
     <input type="button" ref:scaleSubmitButton id="scaleSubmitButton" class="btn btn-primary" value="Submit"
            on:click="handleSubmit(event)"/>
+  </div>
+  <div class="form-group col-md-1">
+    <input type="button" ref:scaleClearButton id="scaleClearButton" class="btn btn-default" value="Clear"
+           on:click="handleClear(event)"/>
   </div>
 </div>
 
@@ -60,20 +64,37 @@
       new Awesomplete(document.getElementById("scaleInput"), {
         list: ["Major", "Harmonic Minor", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian",
           "Phrygian Dominant", "Double Harmonic", "Lydian Dominant", "Super Locrian", "Minor Pentatonic",
-          "Major Pentatonic"
+          "Major Pentatonic", "Melodic Minor"
         ],
         data: function (text, input) {
           return input.slice(0, input.indexOf(" ")) + " " + text;
         },
         filter: Awesomplete.FILTER_STARTSWITH,
+        item: function (text, input) {
+          const html = input.trim() === "" ? text : text.replace(RegExp(Awesomplete.$.regExpEscape(input.trim()), "i"), "<mark>$&</mark>");
+          return Awesomplete.$.create("li", {
+            innerHTML: html,
+            "aria-selected": "false"
+          });
+          },
         replace: function(text) {
           _this.set({scaleName: text})
+        },
+        sort: function(a, b) {
+          if (a === b) return 0;
+          else if (a < b) return -1;
+          else return 1;
         }
       });
     },
     methods: {
       transformSymbols: function (s) {
         return s.replace(/b/g, '\u266D').replace(/#/g, '\u266F');
+      },
+      handleClear: function (event) {
+        this.fretboard.destroy();
+        this.set({scaleName: ""});
+        this.refs.scaleSubmitButton.disabled = true;
       },
       handleSubmit: function (event) {
 
