@@ -72,8 +72,8 @@
       Tuning
     },
     oncreate() {
-      const cs = new ChordService("http://localhost:8080");
-     // const cs = new ChordService(".");
+//      const cs = new ChordService("http://localhost:8080");
+      const cs = new ChordService(".");
       this.set({cs: cs});
       const spinner = new Spinner({lines: 11, length: 0, width: 14, radius: 28, opacity: 0.05});
       this.set({spinner: spinner});
@@ -151,17 +151,23 @@
             renderFretboard(frets)
           });
         } else {
-          _this.get('cs').analyze(_this.get('chordName'),
-            tuning).then(chords => {
+          if (firstChar.match(/[0-9]|x/i)) {
+            _this.get('cs').analyze(_this.get('chordName'),
+              tuning).then(chords => {
+              spinner.stop();
+              renderChords(chords);
+              _this.get('cs').arpeggio(_.map(chords.chordList, c => c.name),
+                tuning).then(frets => {
+                  if (_.isEmpty(frets.arpeggioList))
+                    alert(`Invalid input: ${_this.get('chordName').trim()}`);
+                  else renderFretboard(frets)
+              });
+            })
+          } else {
+            alert(`Invalid input: ${_this.get('chordName').trim()}`);
             spinner.stop();
-            renderChords(chords);
-            _this.get('cs').arpeggio(_.map(chords.chordList, c => c.name),
-              tuning).then(frets => {
-              renderFretboard(frets)
-            });
-          })
+          }
         }
-
       },
       handleChordChange: function (event) {
         const chordName = this.get('chordName');

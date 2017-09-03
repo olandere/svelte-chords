@@ -9,9 +9,6 @@ export default class ChordService {
   analyze(fingering, tuning) {
     return axios.get(`${this.base}/analyze/${encodeURIComponent(fingering.trim())}`,
       {
-        // headers: {
-        //   'Access-Control-Allow-Origin': '*',
-        // },
         params: {
           chord: encodeURIComponent(fingering.trim()),
           tuning: tuning,
@@ -62,6 +59,10 @@ export default class ChordService {
         tuning: tuning
       }
     }).then(r => r.data).catch(r => alert(r));
+  }
+
+  supportedScales() {
+	  return axios.get(`${this.base}/supportedScales`).then(r => r.data).catch(r => alert(r));
   }
 	
 }
