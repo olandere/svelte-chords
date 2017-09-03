@@ -47,10 +47,11 @@
     },
     oncreate() {
       const rootMatcher = /([acdefgABCDEFG][b#\u266D\u266F]?)/;
-      const cs = new ChordService("http://localhost:8080");
-      // const cs = new ChordService(".");
+//      const cs = new ChordService("http://localhost:8080");
+      const cs = new ChordService(".");
       this.set({cs: cs, rootMatcher: rootMatcher});
       this.refs.scaleSubmitButton.disabled = true;
+      this.fretboard = [];
       const _this = this;
 
       document.getElementById("scaleInput")
@@ -61,11 +62,9 @@
           }
         });
 
+      _this.get('cs').supportedScales().then(scales => {
       new Awesomplete(document.getElementById("scaleInput"), {
-        list: ["Major", "Harmonic Minor", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian",
-          "Phrygian Dominant", "Double Harmonic", "Lydian Dominant", "Super Locrian", "Minor Pentatonic",
-          "Major Pentatonic", "Melodic Minor"
-        ],
+        list: scales,
         data: function (text, input) {
           return input.slice(0, input.indexOf(" ")) + " " + text;
         },
@@ -85,26 +84,26 @@
           else if (a < b) return -1;
           else return 1;
         }
-      });
+      })});
     },
     methods: {
       transformSymbols: function (s) {
         return s.replace(/b/g, '\u266D').replace(/#/g, '\u266F');
       },
       handleClear: function (event) {
-        this.fretboard.destroy();
+        this.fretboard.map(f => f.destroy());
+        this.fretboard = [];
         this.set({scaleName: ""});
         this.refs.scaleSubmitButton.disabled = true;
       },
       handleSubmit: function (event) {
 
         function renderFretboard(frets) {
-          _this.fretboard = new FretboardList({
+          _this.fretboard.push( new FretboardList({
             target: document.getElementById('fretboardList'),
             // data: {frets: [[0,5,8,12],[0,3,7,12],[2,7,10],[2,5,9],[1,5,10],[0,5,8,12]],name:"Am"}
             data: frets
-          });
-          //      _this.fretboard.set()
+          }));
         }
 
         const _this = this;
