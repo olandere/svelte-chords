@@ -2,13 +2,13 @@
   <!--Chord name='C' chord='["x", 3, 2, 0, 1, 0]' degrees='["x", "R", "3", "5", "R", "3"]' notes='[]'-->
   {{#if numChords == 1}}
     {{#each chordList as chord}}
-      <Chord name='{{chord.name}}' chord='{{chord.frets}}' degrees='{{chord.degrees}}' notes='{{chord.notes}}'></Chord>
+      <Chord name='{{chord.name}}' chord='{{chord.frets}}' degrees='{{chord.degrees}}' notes='{{chord.notes}}' :footer></Chord>
     {{/each}}
   {{else}}
     {{#each chordList as chordBlock}}
       <div class="chordBlock">
         {{#each chordBlock as chord}}
-          <Chord name='{{chord.name}}' chord='{{chord.frets}}' degrees='{{chord.degrees}}' notes='{{chord.notes}}'></Chord>
+          <Chord name='{{chord.name}}' chord='{{chord.frets}}' degrees='{{chord.degrees}}' notes='{{chord.notes}}' :footer></Chord>
         {{/each}}
       </div>
     {{/each}}
