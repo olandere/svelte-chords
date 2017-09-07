@@ -1,10 +1,25 @@
-<div class="chord" ref:chord></div>
+<div class="chord" ref:chord xmlns:ref="http://www.w3.org/1999/xhtml">
+  <svg>
+  <g>
+    <g class="degrees" visibility="{{footer == 'degrees' ? 'visible' : 'hidden'}}"></g>
+    <g class="notes" visibility="{{footer == 'notes' ? 'visible' : 'hidden'}}"></g>
+  </g>
+  </svg>
+</div>
 <script>
   'use strict';
 
   export default {
     oncreate() {
       this.renderData();
+//      this.refs.chordInput.observe( 'chordFooter', footer => {
+//        this.set({footer: footer});
+//        console.log( `the footer is ${footer}` );
+//      })
+//      this.on('footerChange', event=>{
+//        console.log(`got footerChange: ${event.footer}`)
+//        this.set({footer: event.footer})
+//      })
       //  ['chord', 'degrees', 'notes', 'name']
       //    .forEach(prop => this.observe(prop, () => this.renderData()))
       //	this.observe('chord', () => this.destroy());
@@ -16,6 +31,7 @@
         const degrees = this.get('degrees');
         const notes = this.get('notes');
         const name = this.get('name');
+        //const chordFooter = this.get('footer');
 
         const numStrings = chord.length;
 
@@ -26,7 +42,7 @@
         const topPad = 25;
         const bottomPad = 20;
 
-        const svg = d3.select(this.refs.chord).append('svg').attr('width', w + padding).attr('height', h + topPad + bottomPad);
+        const svg = d3.select(this.refs.chord).select('svg').attr('width', w + padding).attr('height', h + topPad + bottomPad);
 
         let frets = [];
 
@@ -57,7 +73,7 @@
           frets.push(i);
         }
 
-        const chordElem = svg.append('g');
+        const chordElem = svg.select('g');
         chordElem.append('text').attr('text-anchor', 'middle')
           .attr('transform', 'translate(0, 12)')
           .attr('x', (w + padding) / 2)
@@ -119,7 +135,7 @@
         }
 
         // show chord degrees
-        const chordDegrees = chordElem.append('g').selectAll('text')
+        const chordDegrees = chordElem.select('.degrees').selectAll('text')
           .data(degrees)
           .enter()
           .append('text');
@@ -128,6 +144,19 @@
           .attr('y', fretScale(numFrets))
           .attr('text-anchor', 'middle')
           .attr("lengthAdjust", "spacing")
+          .attr("textLength", stringScale(1) - stringScale(0))
+          .text(d => (d === 'x') ? '\u00D7' : d);
+
+        // show note names
+        const chordNotes = chordElem.select('.notes').selectAll('text')
+          .data(notes)
+          .enter()
+          .append('text');
+
+        chordNotes.attr('x', (d, i) => stringScale(i))
+          .attr('y', fretScale(numFrets))
+          .attr('text-anchor', 'middle')
+          .attr("lengthAdjust", d => (d.length > 1) ? "spacingAndGlyphs" : "spacing")
           .attr("textLength", stringScale(1) - stringScale(0))
           .text(d => (d === 'x') ? '\u00D7' : d);
       }

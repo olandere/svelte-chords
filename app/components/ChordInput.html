@@ -24,8 +24,8 @@
     <label>Tuning: </label>
     <Tuning ref:tuning></Tuning>
   </div>
-
 </div>
+
 <div class="row">
   <div class="form-group col-md-3">
     <label class="checkbox-inline">
@@ -35,8 +35,19 @@
       <input type="checkbox" bind:checked='jazz' value="true">Jazz voicings only
     </label>
   </div>
-
 </div>
+
+<div class="row">
+  <div class="form-group col-md-3">
+    <label class="radio-inline">
+      <input type="radio" name="chordFooter" value="degrees" bind:group="chordFooter">Degrees
+    </label>
+    <label class="radio-inline">
+      <input type="radio" name="chordFooter" value="notes" bind:group="chordFooter">Notes
+    </label>
+  </div>
+</div>
+
 <div class="row">
   <div class="form-group col-md-1">
     <input type="button" ref:submitButton id="submitButton" class="btn btn-primary" value="Submit"
@@ -63,7 +74,8 @@
         fretSpan: 4,
         chordName: '',
         span: false,
-        jazz: false
+        jazz: false,
+        chordFooter: 'degrees'
       };
     },
     components: {
@@ -86,6 +98,13 @@
             document.getElementById("submitButton").click();
           }
         });
+
+      this.observe( 'chordFooter', footer => {
+        //this.fire("footerChange", {footer: footer});
+        d3.selectAll("svg").select(".degrees").attr('visibility', () => footer === 'degrees' ? 'visible' : 'hidden');
+        d3.selectAll("svg").select(".notes").attr('visibility', () => footer === 'notes' ? 'visible' : 'hidden');
+        console.log( `the footer is ${footer}` );
+      });
     },
     methods: {
       transformSymbols: function (s) {
@@ -117,7 +136,11 @@
         function renderChords(chords) {
           _this.chordlist = new ChordList({
             target: document.getElementById('chordlist'),
-            data: chords
+            data: {
+              numChords: chords.numChords,
+              chordList: chords.chordList,
+              footer: _this.get('chordFooter')
+            }
           });
         }
 
