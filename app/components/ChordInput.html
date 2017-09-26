@@ -155,7 +155,7 @@
 
         cleardisplay();
         const firstChar = _this.get('chordName').trim().charAt(0);
-        if (firstChar.match(/[abcdefgrs]/i)) {
+        if (firstChar.match(/[abcdefgrs{]/i)) {
           if (_this.get('shell')) {
             _this.get('cs').shellchord(_this.get('fretSpan'), _this.get('chordName'),
               tuning, false, _this.get('jazz')).then(chords => {
