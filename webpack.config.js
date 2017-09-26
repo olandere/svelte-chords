@@ -21,7 +21,10 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.UglifyJsPlugin({ sourceMap: true }),
-    new HtmlWebpackPlugin({title: 'Chord Charts'}),
+    new HtmlWebpackPlugin({
+      template: './html/index.ejs',
+      filename: 'index.html'
+    }),
     new webpack.ProvidePlugin({
       d3: 'd3',
       _: 'lodash',
