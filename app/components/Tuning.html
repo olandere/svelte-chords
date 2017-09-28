@@ -1,5 +1,5 @@
 <div class="input-group">
-  <input type="text" class="tuning form-control" bind:value="tuning" placeholder="EADGBE" size="10" maxlength="10">
+  <input type="text" class="tuning form-control" bind:value="tuning" on:change="addTuning(event)" placeholder="EADGBE" size="10" maxlength="10">
   <div class="input-group-btn">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>
     </button>
@@ -19,28 +19,28 @@
 <script>
 
   'use strict';
-  import store from "store";
+  import store from "store/dist/store.modern";
 
   export default {
     data() {
       return {
-        tuning: ''
+        tuning: '',
+        tunings: ["EADGBE"]
       }
     },
-    computed: {
-      tunings: function (t) {
-        return store.get('tunings') || []
-      }
-    },
+//    computed: {
+//      tunings: function (t) {
+//        return store.get('tunings') || []
+//      }
+    //},
 
     oncreate() {
-
+      this.set({tunings: store.get('tunings') || []});
     },
     methods: {
       changeTuning: function (tuning) {
-        console.log(tuning);
+//        console.log(tuning);
         this.set({tuning: tuning});
-        const x = 7;
       },
 
       tuning: function () {
@@ -51,7 +51,9 @@
         return tuning || 'EADGBE';
       },
 
-      addTuning: function (tuning) {
+      addTuning: function (event) {
+        let tuning = this.get('tuning');
+//        console.log("in addTuning");
         let tunings = this.get('tunings');
         if (_.isArray(tunings)) {
           tunings.push(tuning);
@@ -60,6 +62,7 @@
         } else {
           store.set('tunings', [tuning]);
         }
+        this.set({tunings: store.get('tunings')});
       }
     }
   };
