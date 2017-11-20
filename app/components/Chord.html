@@ -143,7 +143,7 @@
         chordDegrees.attr('x', (d, i) => stringScale(i))
           .attr('y', fretScale(numFrets))
           .attr('text-anchor', 'middle')
-          .attr("lengthAdjust", "spacing")
+          .attr("lengthAdjust", d => (d.length > 1) ? "spacingAndGlyphs" : "spacing")
           .attr("textLength", stringScale(1) - stringScale(0))
           .text(d => (d === 'x') ? '\u00D7' : d);
 
