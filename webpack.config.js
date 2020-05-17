@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 process.traceDeprecation = true;
 
 module.exports = {
+	mode: 'development',
   cache: true,
   devtool: 'source-map',
   devServer: {
@@ -11,6 +12,9 @@ module.exports = {
     compress: true,
     port: 9000
   },
+	optimization: {
+	  minimize: true
+	},
   entry: ["./app/main.js"],
   resolve: {
     extensions: ['.js', '.html', '.css']
@@ -20,7 +24,6 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({ sourceMap: true }),
     new HtmlWebpackPlugin({
       template: './html/index.ejs',
       filename: 'index.html'
@@ -38,7 +41,12 @@ module.exports = {
       {
         test: [/\.html$/, /\.js$/],
         exclude: [/node_modules/],
-        use: [{loader: "babel-loader"}]
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
       },
       {test: /\.html$/, exclude: [/node_modules/], use: 'svelte-loader'},
       {test: /\.css$/, use: ['style-loader', 'css-loader']},
